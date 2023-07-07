@@ -7,20 +7,21 @@ app=FastAPI()
 
 dbcon=MongoClient("mongodb+srv://kollujagadishreddy:jagadish17@cluster0.gtfxrem.mongodb.net/")
 db=dbcon.get_database("fastapi")
-records=db.user
+collection=db.user
 
 @app.get("/")
 def home():
     return {"message":"Hello World"}
 
-@app.get("/get_user")
+@app.get("/get_users")
 def get_users():
-    users=records.find().to_json()
-    user=json.loads(users)
-    print(user)
-    return {"users":user}
+    users=list(collection.find())
+    for user in users:   
+        del user["_id"]
+    print(users)
+    return users
 
 @app.post("/insert_user")
 def insert_user(document: dict):
-    records.insert_one(document)
+    collection.insert_one(document)
     return {"message":"Data inserted succesfully!"}
